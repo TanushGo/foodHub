@@ -1,50 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect} from 'react'
 import { supabase } from './client'
+import Card from './components/Card'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-  const createRow = async (event) => {
-    event.preventDefault();
-
-   const { error } = await supabase
-    .from('social')
-    .insert({title :"In-n-out meal", content: "Complete meal from in-n-out with burger and shake", upvotes: 53, img:"https://media-cdn.tripadvisor.com/media/photo-s/0e/0f/03/95/burger-fries-and-shake.jpg"})
-    .select()
-
-    if (error) {
-        console.log(error);
+  const [list, setList] = useState({})
+  const [filteredResults, setFilteredResults] = useState({});
+  const [searchInput, setSearchInput] = useState("");
+  const searchItems = searchValue => {
+    setSearchInput(searchValue);
+    if (searchValue !== "") {
+      const filteredData = Object.fromEntries(Object.entries(list).filter((item) => 
+      Object.values(item[1].title)
+        .join("")
+        .toLowerCase()
+        .includes(searchValue.toLowerCase())
+      ))
+      setFilteredResults(filteredData);
+    } else {
+      setFilteredResults(list);
     }
-    //window.location = "/";
-}
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+  };
+    useEffect(() => {
+        const fetchPost = async () => {
+            const {data} = await supabase
+            .from('social')
+            .select('*')
+            .order('created_at', { ascending: true })
+        
+        setList(data);
+        }
+        fetchPost();
+        
+    }, []); 
+    
+    
+    return (
+      <div className='whole-page'>
+        {console.log(list)}
+        <input
+          type="text"
+          name="post-search"
+          placeholder="Search"
+          className='search-bar'
+          onChange={(inputString) => searchItems(inputString.target.value)}
+        />
+        <div className="post-container">
+            {searchInput.length > 0 ?
+                  Object.entries(filteredResults).map((i,index) => {
+                  return (<Card id={i[1].id} title={i[1].title} content={i[1].content} img={i[1].img} upvotes={i[1].upvotes} time={i[1].created_at} key={index} /> )})
+              : 
+              
+              Object.entries(list).map((i,index) =>{
+                return (<Card id={i[1].id} title={i[1].title} content={i[1].content} img={i[1].img} upvotes={i[1].upvotes} time={i[1].created_at} key={index} /> )})
+                 
+            }
+        </div>  
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <button onClick ={createRow}>
-          add row
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
   )
 }
 
