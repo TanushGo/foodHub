@@ -17,32 +17,54 @@ const Post = () => {
         
         setFullDetails(data[0]);
         }
-        
         fetchPost().catch(console.error);
-    }, []);
+    }, [fullDetails]);
+
+    const likePost = async () => {
+        const { data, error } = await supabase
+            .from('social')
+            .update({ upvotes: fullDetails.upvotes + 1 })
+            .eq('id', params.id)
+            .select()
+        setFullDetails(data[0])
+    }
+    function timeSince(date1) {
+        var seconds = Math.floor((new Date() - date1) / 1000);
+      
+        var interval = seconds / 31536000;
+      
+        if (interval > 1) {
+          return Math.floor(interval) + " years";
+        }
+        interval = seconds / 2592000;
+        if (interval > 1) {
+          return Math.floor(interval) + " months";
+        }
+        interval = seconds / 86400;
+        if (interval > 1) {
+          return Math.floor(interval) + " days";
+        }
+        interval = seconds / 3600;
+        if (interval > 1) {
+          return Math.floor(interval) + " hours";
+        }
+        interval = seconds / 60;
+        if (interval > 1) {
+          return Math.floor(interval) + " minutes";
+        }
+        return Math.floor(seconds) + " seconds";
+      }
     return (
     <div className="post-content">
-        <h1>{fullDetails.title}</h1>
+        <h3 className="time">Posted {timeSince(new Date(fullDetails.created_at))} ago</h3>
+        <h2 className="title">{fullDetails.title}</h2>
+        <img src={fullDetails.img} height="100px" width="auto"></img>
         <p>{fullDetails.content}</p>
+        <img src="src/assets/thumbs-up" height="100px" width="auto"  onClick={likePost}></img>
+        <h3 className="upvotes">{fullDetails.upvotes} votes</h3>
+        
     </div>
     )
 }
 
-
-
-
-const BreweryDetail = () => {
-    
-
-    console.log(fullDetails)
-    return (<div>
-        <h1>{fullDetails.name}</h1>
-        <h4>Brewery Type: {fullDetails.brewery_type}</h4>
-        <p>Address:</p>
-        <p>{fullDetails.street}, {fullDetails.city}, {fullDetails.state}</p>
-        <a href={fullDetails.website_url}>{fullDetails.website_url}</a>
-        <p>Latitude : {fullDetails.latitude}  & Longitude : {fullDetails.longitude}</p>
-    </div>
-    )
-}
 export default Post;
