@@ -19,7 +19,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route index={true} element={<App />} />
           <Route index={false} path="/post/:id" element={<PostView />} />
           <Route index={false} path="/create" element={<CreateView />} />
-          <Route index={false} path="/post/:id/edit" element={<EditView />} />
+          <Route index={false} path="/post/edit/:id" element={<EditView />} />
           <Route
             path="*"
             element={

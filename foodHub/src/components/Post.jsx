@@ -2,10 +2,33 @@ import React, { Component, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../client";
 import "./Post.css"
+import Pen from "/src/assets/Pen.png"
+import ThumbsUp from "/src/assets/thumbs-up.png"
+import { Link } from "react-router-dom";
+import Trash from "/src/assets/trash.png"
 
 const Post = () => {
     let params = useParams();
-    const [fullDetails, setFullDetails] = useState({});
+    const [fullDetails, setFullDetails] = useState({comments :[]});
+    const [newComment, setNewComment] = useState("");
+
+    const handleChange = (event) => {
+        
+        const {name, value} = event.target;
+        console.log(name, value)
+        setNewComment(value)
+        console.log(newComment);
+    }
+
+    const addComment = async () => {
+        const { data, error } = await supabase
+            .from('social')
+            .update({ comments: [...fullDetails.comments, newComment] })
+            .eq('id', params.id)
+            .select()
+        setFullDetails(data[0])
+        setNewComment('')
+    }
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -17,6 +40,7 @@ const Post = () => {
         
         setFullDetails(data[0]);
         }
+        
         fetchPost().catch(console.error);
     }, [fullDetails]);
 
@@ -27,6 +51,16 @@ const Post = () => {
             .eq('id', params.id)
             .select()
         setFullDetails(data[0])
+    }
+
+    const deletePost = async () => {
+        const { error } = await supabase
+            .from('social')
+            .delete()
+            .eq('id', params.id)
+
+        window.location = "/";
+                
     }
     function timeSince(date1) {
         var seconds = Math.floor((new Date() - date1) / 1000);
@@ -60,9 +94,19 @@ const Post = () => {
         <h2 className="title">{fullDetails.title}</h2>
         <img src={fullDetails.img} height="100px" width="auto"></img>
         <p>{fullDetails.content}</p>
-        <img src="src/assets/thumbs-up" height="100px" width="auto"  onClick={likePost}></img>
+        <img name ="like" src={ThumbsUp} height="100px" width="auto"  onClick={likePost}></img>
         <h3 className="upvotes">{fullDetails.upvotes} votes</h3>
-        
+        <h3>Comments:</h3>
+        {fullDetails.comments.map((i) => <p key={i}>- {i} </p>)}
+        <div className="mini-container">
+            <label id='comments'><h3>Add comment</h3></label>
+            <input type="text" name="comments" placeholder="Add comment.." value ={newComment} onChange={handleChange} />
+            <button type='submit' onClick={addComment}>Submit</button>
+        </div>
+        <Link to={'/post/edit/'+ fullDetails.id}>
+        <img src={Pen} height="20px" width="auto"></img>
+        </Link>
+        <img src={Trash} height="20px" width="auto" onClick={deletePost}></img>
     </div>
     )
 }
