@@ -1,6 +1,7 @@
 import { supabase } from '../client'
 import { useState } from 'react'
 import "./Create.css"
+import meal from "/src/assets/meal.png"
 
 const Create = () => {
    
@@ -36,7 +37,7 @@ const Create = () => {
 
     return (<div className='create-page'>
         <h1>Create a new  food post!</h1>
-        <img src="src/assets/meal.png" height="100px" width="auto"></img>
+        <img src={meal} height="100px" width="auto"></img>
         <br></br>
         <form className="form-container">
             <div className="mini-container">

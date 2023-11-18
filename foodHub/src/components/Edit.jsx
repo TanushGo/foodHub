@@ -1,7 +1,7 @@
 import { supabase } from '../client'
 import { useState, useEffect } from 'react'
 import { useParams } from "react-router-dom";
-    
+import meal from "/src/assets/meal.png"
 import "./Create.css"
 
 const Edit = () => {
@@ -52,7 +52,7 @@ const Edit = () => {
 
     return (<div className='create-page'>
         <h1>Edit the food post!</h1>
-        <img src="src/assets/meal.png" height="100px" width="auto"></img>
+        <img src={meal} height="100px" width="auto"></img>
         <br></br>
         <form className="form-container">
             <div className="mini-container">
